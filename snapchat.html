@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapchat Gateway | Sardar RDX</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body onload="sessionStorage.setItem('selectedPlatform','snapchat')">
+    <div class="container" style="text-align:center;padding-top:8vh;">
+        <div class="glass gateway-card">
+            <i class="fab fa-snapchat gateway-icon" style="color:#FFFC00;"></i>
+            <h2 style="font-family:'Orbitron',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:1rem;color:#FFFC00;text-shadow:0 0 20px #FFFC00;">SNAPCHAT SERVICES</h2>
+            <p style="color:var(--text-dim);margin-bottom:2rem;line-height:1.7;">To access premium Snapchat offers, please use the following link in your Chrome browser.</p>
+
+            <div class="link-box" style="border-color:rgba(255,252,0,0.2);">
+                <i class="fas fa-link" style="color:#FFFC00;"></i>
+                <input type="text" id="gen-link" readonly value="">
+                <button class="btn" onclick="copyLink()" style="padding:0.5rem 1.2rem;white-space:nowrap;font-size:0.8rem;letter-spacing:1px;background:#FFFC00;color:#000;font-weight:700;">
+                    <i class="fas fa-copy" style="margin-right:0.3rem;"></i>COPY
+                </button>
+            </div>
+
+            <div style="margin-top:2.5rem;text-align:left;">
+                <div class="step-item">
+                    <div class="step-num" style="background:#FFFC00;color:#000;">1</div>
+                    <span style="color:#00ff88;font-size:0.9rem;">Copy the link above</span>
+                </div>
+                <div class="step-item">
+                    <div class="step-num" style="background:#FFFC00;color:#000;">2</div>
+                    <span style="color:#00ff88;font-size:0.9rem;">Open Chrome Browser</span>
+                </div>
+                <div class="step-item">
+                    <div class="step-num" style="background:#FFFC00;color:#000;">3</div>
+                    <span style="color:#00ff88;font-size:0.9rem;">Paste and Enter to access offers</span>
+                </div>
+            </div>
+
+            <div style="margin-top:2.5rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+                <a href="offers.html" class="btn" style="font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:2px;background:#FFFC00;color:#000;font-weight:700;">
+                    <i class="fas fa-bolt" style="margin-right:0.5rem;"></i>OPEN OFFERS
+                </a>
+                <a href="index.html" class="btn btn-glow" style="font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:2px;">
+                    <i class="fas fa-arrow-left" style="margin-right:0.5rem;"></i>GO BACK
+                </a>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('gen-link').value = window.location.origin + '/offers?ref=snapchat';
+
+        function copyLink() {
+            const el = document.getElementById('gen-link');
+            navigator.clipboard.writeText(el.value);
+            const btn = document.querySelector('.link-box button');
+            btn.innerHTML = '<i class="fas fa-check" style="margin-right:0.3rem;"></i>COPIED!';
+            btn.style.background = 'linear-gradient(135deg,#00ff88,#059669)';
+            btn.style.color = 'white';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-copy" style="margin-right:0.3rem;"></i>COPY';
+                btn.style.background = '#FFFC00';
+                btn.style.color = '#000';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

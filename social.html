@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Gateway | Sardar RDX</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container" style="text-align:center;padding-top:8vh;">
+        <div class="glass gateway-card">
+            <div id="platform-icon" class="gateway-icon"></div>
+            <h2 id="platform-title" style="font-family:'Orbitron',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:1rem;"></h2>
+            <p style="color:var(--text-dim);margin-bottom:2rem;line-height:1.7;">To access premium offers, please use the following link in your Chrome browser.</p>
+
+            <div class="link-box">
+                <i class="fas fa-link" style="color:var(--neon-blue);"></i>
+                <input type="text" id="generated-link" readonly value="https://sardarrdx.com/get-offers-v4">
+                <button class="btn btn-primary" onclick="copyLink()" style="padding:0.5rem 1.2rem;font-size:0.8rem;letter-spacing:1px;white-space:nowrap;">
+                    <i class="fas fa-copy" style="margin-right:0.3rem;"></i>COPY
+                </button>
+            </div>
+
+            <div style="margin-top:2.5rem;text-align:left;">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <span style="color:#00ff88;font-size:0.9rem;">Copy the link above</span>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <span style="color:#00ff88;font-size:0.9rem;">Open Chrome Browser</span>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <span style="color:#00ff88;font-size:0.9rem;">Paste and Enter to access offers</span>
+                </div>
+            </div>
+
+            <div style="margin-top:2.5rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+                <a href="offers.html" class="btn btn-primary glowing" style="font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:2px;">
+                    <i class="fas fa-bolt" style="margin-right:0.5rem;"></i>OPEN OFFERS
+                </a>
+                <a href="index.html" class="btn btn-glow" style="font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:2px;">
+                    <i class="fas fa-arrow-left" style="margin-right:0.5rem;"></i>GO BACK
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const platform = sessionStorage.getItem('selectedPlatform') || 'facebook';
+        const iconMap = {
+            'facebook': '<i class="fab fa-facebook" style="color:#1877F2;"></i>',
+            'instagram': '<i class="fab fa-instagram" style="background:var(--ig-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>',
+            'snapchat': '<i class="fab fa-snapchat" style="color:#FFFC00;"></i>',
+            'tiktok': '<i class="fab fa-tiktok" style="color:#00f2ea;"></i>'
+        };
+        document.getElementById('platform-icon').innerHTML = iconMap[platform];
+        document.getElementById('platform-title').innerText = platform.charAt(0).toUpperCase() + platform.slice(1) + ' Services';
+        document.getElementById('generated-link').value = 'https://sardarrdx.rdx/services/' + platform + '/auth-key-8821';
+
+        function copyLink() {
+            const el = document.getElementById('generated-link');
+            el.select();
+            navigator.clipboard.writeText(el.value);
+            const btn = document.querySelector('.link-box button');
+            btn.innerHTML = '<i class="fas fa-check" style="margin-right:0.3rem;"></i>COPIED!';
+            btn.style.background = 'linear-gradient(135deg,#00ff88,#059669)';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-copy" style="margin-right:0.3rem;"></i>COPY';
+                btn.style.background = '';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offers | Sardar RDX</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===== COIN WALLET ===== */
+        .coin-wallet {
+            background: linear-gradient(135deg, rgba(255, 180, 0, 0.08), rgba(255, 100, 0, 0.04));
+            border: 1px solid rgba(255, 180, 0, 0.25);
+            border-radius: 20px;
+            padding: 1.8rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(255, 180, 0, 0.05), inset 0 0 40px rgba(0,0,0,0.3);
+            animation: coinWalletGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes coinWalletGlow {
+            from { box-shadow: 0 0 20px rgba(255,180,0,0.05); border-color: rgba(255,180,0,0.2); }
+            to   { box-shadow: 0 0 40px rgba(255,180,0,0.15); border-color: rgba(255,180,0,0.4); }
+        }
+        .coin-wallet::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(transparent, rgba(255,180,0,0.03), transparent 30%);
+            animation: rotateBorder 8s linear infinite;
+        }
+
+        .coin-balance-wrap {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            z-index: 1;
+        }
+        .coin-icon-big {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 0 20px rgba(255,180,0,0.5), 0 0 40px rgba(255,180,0,0.2);
+            animation: coinFloat 3s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes coinFloat {
+            0%,100% { transform: translateY(0) rotateY(0deg); box-shadow: 0 0 20px rgba(255,180,0,0.5); }
+            50%      { transform: translateY(-6px) rotateY(180deg); box-shadow: 0 10px 30px rgba(255,180,0,0.7); }
+        }
+        .coin-balance-info { z-index: 1; }
+        .coin-label {
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: rgba(255,180,0,0.7);
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+        }
+        .coin-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px rgba(255,180,0,0.5);
+            line-height: 1;
+            transition: all 0.3s;
+        }
+        .coin-sublabel {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
+            margin-top: 0.2rem;
+            letter-spacing: 1px;
+        }
+
+        /* ===== CLAIM BUTTON ===== */
+        .claim-section { z-index: 1; text-align: center; }
+        .btn-claim {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            padding: 1rem 2rem;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(255,180,0,0.4), 0 0 0 1px rgba(255,180,0,0.2);
+            transition: all 0.3s;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-claim:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 30px rgba(255,180,0,0.6), 0 0 0 2px rgba(255,180,0,0.3);
+        }
+        .btn-claim:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-claim .claim-shimmer {
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: claimShimmer 2s infinite;
+        }
+        @keyframes claimShimmer {
+            0%   { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .claim-progress {
+            margin-top: 0.8rem;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            display: none;
+        }
+        .claim-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            border-radius: 4px;
+            transition: width 2s linear;
+            box-shadow: 0 0 10px #ffd700;
+        }
+        .claim-status {
+            font-size: 0.75rem;
+            color: rgba(255,180,0,0.7);
+            margin-top: 0.4rem;
+            letter-spacing: 1px;
+            text-align: center;
+            min-height: 1rem;
+        }
+
+        /* Coin earn float animation */
+        .coin-earn-popup {
+            position: fixed;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            pointer-events: none;
+            z-index: 9999;
+            animation: coinEarnFloat 1.5s ease-out forwards;
+        }
+        @keyframes coinEarnFloat {
+            0%   { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+        }
+
+        /* ===== NOT ENOUGH COINS ===== */
+        .no-coins-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            z-index: 600;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(12px);
+        }
+        .no-coins-box {
+            background: rgba(5,10,20,0.9);
+            border: 1px solid rgba(255,180,0,0.3);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(255,180,0,0.1);
+            animation: fadeInUp 0.3s ease-out;
+        }
+        .no-coins-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: coinFloat 2s ease-in-out infinite;
+            display: block;
+        }
+        .coins-needed-bar {
+            background: rgba(255,255,255,0.05);
+            border-radius: 50px;
+            height: 10px;
+            margin: 1.2rem 0;
+            overflow: hidden;
+            border: 1px solid rgba(255,180,0,0.15);
+        }
+        .coins-needed-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            border-radius: 50px;
+            box-shadow: 0 0 10px #ffd700;
+            transition: width 0.8s ease;
+        }
+
+        /* ===== OFFER CARD COIN REQUIREMENT ===== */
+        .coin-req {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(255,180,0,0.1);
+            border: 1px solid rgba(255,180,0,0.25);
+            border-radius: 50px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.75rem;
+            color: #ffd700;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .coin-req i { font-size: 0.7rem; }
+
+        /* Account Preview Card */
+        .account-preview {
+            display: none;
+            margin-top: 1rem;
+            padding: 0.9rem 1.1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(0,245,255,0.2);
+            background: rgba(0,245,255,0.04);
+            animation: fadeInUp 0.3s ease-out;
+            align-items: center;
+            gap: 0.9rem;
+            text-align: left;
+        }
+        .account-preview.show { display: flex; }
+        .account-preview.error {
+            border-color: rgba(239,68,68,0.35);
+            background: rgba(239,68,68,0.05);
+        }
+        .preview-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .preview-info { flex: 1; min-width: 0; }
+        .preview-platform {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 0.15rem;
+        }
+        .preview-username {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0,245,255,0.4);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .preview-realname {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        @keyframes scanPulse {
+            0%,100% { opacity: 0.4; }
+            50%      { opacity: 1; }
+        }
+        .scanning-text {
+            font-size: 0.75rem;
+            color: #ffd700;
+            letter-spacing: 2px;
+            animation: scanPulse 0.8s ease-in-out infinite;
+        }
+        .preview-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+        #post-link.valid-link   { border-color: rgba(0,255,136,0.4) !important; }
+        #post-link.invalid-link { border-color: rgba(239,68,68,0.4) !important; }
+    </style>
+</head>
+<body onload="checkAccess()">
+    <div class="container">
+
+        <!-- Top Bar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:1.5rem 0;border-bottom:1px solid rgba(0,245,255,0.08);">
+            <span class="neon-title" style="font-size:1.3rem;">⚡ RDX OFFERS</span>
+            <div id="user-info" class="glass" style="padding:0.4rem 1rem;font-size:0.8rem;border-color:rgba(0,245,255,0.2);color:var(--neon-blue);letter-spacing:1px;"></div>
+        </div>
+
+        <!-- Header -->
+        <header style="padding:2rem 0 1rem;">
+            <div class="header-badge" id="platform-badge">SERVICES</div>
+            <h1 id="platform-heading" style="font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:900;background:linear-gradient(135deg,#fff,var(--neon-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.4rem;">Premium Services</h1>
+            <p style="color:var(--text-dim);letter-spacing:2px;font-size:0.85rem;">Claim coins — then unlock your offer</p>
+        </header>
+
+        <!-- ===== COIN WALLET ===== -->
+        <div class="coin-wallet">
+            <div class="coin-balance-wrap">
+                <div class="coin-icon-big">🪙</div>
+                <div class="coin-balance-info">
+                    <div class="coin-label">Your Balance</div>
+                    <div class="coin-amount" id="coin-display">0</div>
+                    <div class="coin-sublabel">Coins Available</div>
+                </div>
+            </div>
+            <div class="claim-section">
+                <button class="btn-claim" id="claim-btn" onclick="claimCoin()">
+                    <div class="claim-shimmer"></div>
+                    <i class="fas fa-coins"></i>
+                    <span id="claim-btn-text">CLAIM 1 COIN</span>
+                </button>
+                <div class="claim-progress" id="claim-progress">
+                    <div class="claim-progress-bar" id="claim-bar"></div>
+                </div>
+                <div class="claim-status" id="claim-status">Tap to earn coins</div>
+            </div>
+        </div>
+
+        <!-- Free Packages -->
+        <div class="section-divider">
+            <span class="section-title"><i class="fas fa-gift" style="margin-right:0.5rem;"></i>Free Packages</span>
+        </div>
+
+        <div class="offers-grid">
+            <div class="offer-card">
+                <span class="free-badge">Limited</span>
+                <div class="coin-req"><i class="fas fa-coins"></i> 10 COINS</div>
+                <div class="price">10 FREE</div>
+                <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:0.3rem;">Likes / Followers</p>
+                <p style="color:var(--text-dim);font-size:0.75rem;">Instant Start</p>
+                <button class="btn btn-primary" style="margin-top:1.2rem;width:100%;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="selectOffer(10)">
+                    <i class="fas fa-bolt" style="margin-right:0.4rem;"></i>GET NOW
+                </button>
+            </div>
+            <div class="offer-card">
+                <span class="free-badge">Popular</span>
+                <div class="coin-req"><i class="fas fa-coins"></i> 20 COINS</div>
+                <div class="price">20 FREE</div>
+                <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:0.3rem;">Likes / Followers</p>
+                <p style="color:var(--text-dim);font-size:0.75rem;">High Quality</p>
+                <button class="btn btn-primary" style="margin-top:1.2rem;width:100%;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="selectOffer(20)">
+                    <i class="fas fa-bolt" style="margin-right:0.4rem;"></i>GET NOW
+                </button>
+            </div>
+            <div class="offer-card">
+                <span class="free-badge">Daily</span>
+                <div class="coin-req"><i class="fas fa-coins"></i> 30 COINS</div>
+                <div class="price">30 FREE</div>
+                <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:0.3rem;">Likes / Followers</p>
+                <p style="color:var(--text-dim);font-size:0.75rem;">Real Accounts</p>
+                <button class="btn btn-primary" style="margin-top:1.2rem;width:100%;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="selectOffer(30)">
+                    <i class="fas fa-bolt" style="margin-right:0.4rem;"></i>GET NOW
+                </button>
+            </div>
+            <div class="offer-card" style="border-color:rgba(0,245,255,0.15);">
+                <span class="free-badge">Mega</span>
+                <div class="coin-req"><i class="fas fa-coins"></i> 50 COINS</div>
+                <div class="price">50 FREE</div>
+                <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:0.3rem;">Likes / Followers</p>
+                <p style="color:var(--text-dim);font-size:0.75rem;">Best Value</p>
+                <button class="btn btn-primary" style="margin-top:1.2rem;width:100%;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="selectOffer(50)">
+                    <i class="fas fa-bolt" style="margin-right:0.4rem;"></i>GET NOW
+                </button>
+            </div>
+        </div>
+
+        <!-- Paid Packages -->
+        <div class="section-divider" style="margin-top:4rem;">
+            <span class="section-title" style="color:#f59e0b;"><i class="fas fa-crown" style="margin-right:0.5rem;"></i>Paid Packages</span>
+        </div>
+        <div class="offers-grid">
+            <div class="offer-card" style="border-color:rgba(245,158,11,0.2);">
+                <div class="price" style="color:#f59e0b;text-shadow:0 0 20px #f59e0b;">$5.00</div>
+                <h3 style="font-family:'Orbitron',sans-serif;font-size:0.9rem;letter-spacing:2px;margin-bottom:0.5rem;">100 PREMIUM</h3>
+                <p style="color:var(--text-dim);font-size:0.85rem;">High Quality Assets</p>
+                <button class="btn" style="margin-top:1.5rem;width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;font-weight:700;" onclick="selectOffer(100, true)">
+                    <i class="fas fa-shopping-cart" style="margin-right:0.4rem;"></i>BUY NOW
+                </button>
+            </div>
+            <div class="offer-card" style="border-color:rgba(245,158,11,0.3);">
+                <div class="price" style="color:#f59e0b;text-shadow:0 0 20px #f59e0b;">$9.00</div>
+                <h3 style="font-family:'Orbitron',sans-serif;font-size:0.9rem;letter-spacing:2px;margin-bottom:0.5rem;">150 PREMIUM</h3>
+                <p style="color:var(--text-dim);font-size:0.85rem;">Instant Delivery</p>
+                <button class="btn" style="margin-top:1.5rem;width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;font-weight:700;" onclick="selectOffer(150, true)">
+                    <i class="fas fa-shopping-cart" style="margin-right:0.4rem;"></i>BUY NOW
+                </button>
+            </div>
+            <div class="offer-card" style="border-color:rgba(245,158,11,0.4);">
+                <div class="price" style="color:#f59e0b;text-shadow:0 0 20px #f59e0b;">$15.00</div>
+                <h3 style="font-family:'Orbitron',sans-serif;font-size:0.9rem;letter-spacing:2px;margin-bottom:0.5rem;">200 PREMIUM</h3>
+                <p style="color:var(--text-dim);font-size:0.85rem;">Lifetime Support</p>
+                <button class="btn" style="margin-top:1.5rem;width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;font-weight:700;" onclick="selectOffer(200, true)">
+                    <i class="fas fa-shopping-cart" style="margin-right:0.4rem;"></i>BUY NOW
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <a href="index.html" style="color:var(--text-dim);text-decoration:none;font-size:0.85rem;letter-spacing:1px;transition:color 0.3s;" onmouseover="this.style.color='var(--neon-blue)'" onmouseout="this.style.color='var(--text-dim)'">
+                <i class="fas fa-arrow-left" style="margin-right:0.4rem;"></i>Back to Home
+            </a>
+        </footer>
+    </div>
+
+    <!-- ===== NOT ENOUGH COINS POPUP ===== -->
+    <div class="no-coins-overlay" id="no-coins-overlay">
+        <div class="no-coins-box">
+            <span class="no-coins-icon">🪙</span>
+            <h3 style="font-family:'Orbitron',sans-serif;font-size:1.2rem;letter-spacing:2px;color:#ffd700;text-shadow:0 0 15px #ffd700;margin-bottom:0.5rem;">NOT ENOUGH COINS</h3>
+            <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:1rem;" id="coins-needed-msg"></p>
+
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:rgba(255,255,255,0.5);margin-bottom:0.4rem;">
+                <span>Your balance: <span id="nc-balance" style="color:#ffd700;font-weight:700;"></span></span>
+                <span>Required: <span id="nc-required" style="color:#ff6b6b;font-weight:700;"></span></span>
+            </div>
+            <div class="coins-needed-bar">
+                <div class="coins-needed-fill" id="coins-needed-fill"></div>
+            </div>
+            <p style="color:rgba(255,180,0,0.7);font-size:0.8rem;letter-spacing:1px;margin-bottom:1.5rem;" id="nc-still-need"></p>
+
+            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                <button class="btn-claim" style="min-width:140px;" onclick="closeNoCoinModal(); setTimeout(()=>document.getElementById('claim-btn').scrollIntoView({behavior:'smooth'}),200);">
+                    <div class="claim-shimmer"></div>
+                    <i class="fas fa-coins"></i> CLAIM COINS
+                </button>
+                <button class="btn" style="background:rgba(51,65,85,0.8);border:1px solid rgba(255,255,255,0.08);font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;padding:0.8rem 1.2rem;" onclick="closeNoCoinModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== OFFER LINK MODAL ===== -->
+    <div id="link-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:500;justify-content:center;align-items:center;backdrop-filter:blur(10px);">
+        <div class="glass" style="padding:3rem;max-width:500px;width:90%;border-color:rgba(0,245,255,0.2);box-shadow:0 0 60px rgba(0,245,255,0.1);animation:fadeInUp 0.3s ease-out;">
+            <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem;">
+                <h3 style="font-family:'Orbitron',sans-serif;font-size:1.1rem;letter-spacing:2px;">Complete Request</h3>
+                <span style="background:rgba(255,180,0,0.15);border:1px solid rgba(255,180,0,0.3);color:#ffd700;font-size:0.7rem;padding:0.2rem 0.6rem;border-radius:50px;letter-spacing:1px;white-space:nowrap;" id="modal-coin-cost"></span>
+            </div>
+            <p style="color:var(--text-dim);margin-bottom:1.5rem;font-size:0.9rem;">Paste your profile or post link to submit your order.</p>
+            <div class="form-group">
+                <input type="text" id="post-link" placeholder="Paste your link here..." style="width:100%;" oninput="parseProfileLink()">
+            </div>
+
+            <!-- Live Account Preview -->
+            <div class="account-preview" id="account-preview" style="margin-top:0.5rem;margin-bottom:1.5rem;">
+                <div class="preview-icon" id="preview-icon"></div>
+                <div class="preview-info">
+                    <div class="preview-platform" id="preview-platform"></div>
+                    <div class="preview-username" id="preview-username"></div>
+                    <div class="preview-realname" id="preview-realname"></div>
+                </div>
+                <span class="preview-badge" id="preview-badge"></span>
+            </div>
+            <div style="display:flex;gap:1rem;margin-top:1rem;">
+                <button class="btn btn-primary" style="flex:1;font-family:'Orbitron',sans-serif;font-size:0.8rem;letter-spacing:2px;" onclick="submitRequest()">
+                    <i class="fas fa-paper-plane" style="margin-right:0.4rem;"></i>SUBMIT
+                </button>
+                <button class="btn" style="flex:1;background:rgba(51,65,85,0.8);border:1px solid rgba(255,255,255,0.08);font-family:'Orbitron',sans-serif;font-size:0.8rem;letter-spacing:2px;" onclick="closeModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== WAITING SCREEN ===== -->
+    <div id="waiting-screen">
+        <div class="timer-circle">24h</div>
+        <h2 style="font-family:'Orbitron',sans-serif;font-size:2rem;letter-spacing:3px;margin-bottom:1rem;color:var(--neon-blue);text-shadow:0 0 20px var(--neon-blue);">REQUEST RECEIVED!</h2>
+        <p style="color:var(--text-dim);font-size:1rem;max-width:500px;line-height:1.8;padding:0 1rem;">Your request is being processed by our global servers. Due to high demand, please wait 24 hours for delivery to complete.</p>
+        <p style="margin-top:1.5rem;color:var(--neon-green);font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:2px;" id="ref-id"></p>
+        <button class="btn btn-primary" style="margin-top:3rem;font-family:'Orbitron',sans-serif;letter-spacing:3px;" onclick="window.location.href='index.html'">
+            <i class="fas fa-home" style="margin-right:0.5rem;"></i>BACK TO HOME
+        </button>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // ==================== COINS SYSTEM ====================
+        let selectedAmount = 0;
+        let isClaiming = false;
+        let countdownInterval = null;
+
+        const COOLDOWN_MS   = 5 * 60 * 60 * 1000; // 5 hours
+        const MAX_PER_SESSION = 10;                 // claims allowed before cooldown
+
+        function getUserKey()        { return 'rdx_coins_'      + (sessionStorage.getItem('currentUser') || 'guest'); }
+        function getCooldownKey()    { return 'rdx_cooldown_'   + (sessionStorage.getItem('currentUser') || 'guest'); }
+        function getSessionKey()     { return 'rdx_session_'    + (sessionStorage.getItem('currentUser') || 'guest'); }
+
+        function getCoins() { return parseInt(localStorage.getItem(getUserKey()) || '0'); }
+        function setCoins(n) { localStorage.setItem(getUserKey(), n); animateCoinDisplay(n); }
+
+        // How many coins claimed in this current session
+        function getSessionClaims() {
+            const data = JSON.parse(localStorage.getItem(getSessionKey()) || '{"count":0,"start":0}');
+            // If cooldown has expired, reset session automatically
+            if (data.start && (Date.now() - data.start) >= COOLDOWN_MS) {
+                localStorage.removeItem(getSessionKey());
+                localStorage.removeItem(getCooldownKey());
+                return 0;
+            }
+            return data.count || 0;
+        }
+
+        function addSessionClaim() {
+            const data = JSON.parse(localStorage.getItem(getSessionKey()) || '{"count":0,"start":0}');
+            const count = (data.count || 0) + 1;
+            const start = data.start || Date.now();
+            localStorage.setItem(getSessionKey(), JSON.stringify({ count, start }));
+            return count;
+        }
+
+        function getCooldownRemaining() {
+            const ts = parseInt(localStorage.getItem(getCooldownKey()) || '0');
+            if (!ts) return 0;
+            const remaining = COOLDOWN_MS - (Date.now() - ts);
+            return remaining > 0 ? remaining : 0;
+        }
+
+        function animateCoinDisplay(target) {
+            const el = document.getElementById('coin-display');
+            const current = parseInt(el.textContent) || 0;
+            if (current === target) return;
+            const diff = target - current;
+            const steps = Math.min(Math.abs(diff), 30);
+            let i = 0;
+            const interval = setInterval(() => {
+                i++;
+                el.textContent = current + Math.round((diff * i) / steps);
+                if (i >= steps) { el.textContent = target; clearInterval(interval); }
+            }, 20);
+        }
+
+        function formatCountdown(ms) {
+            const s = Math.floor(ms / 1000);
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const sec = s % 60;
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+        }
+
+        function updateClaimUI() {
+            const btn     = document.getElementById('claim-btn');
+            const btnText = document.getElementById('claim-btn-text');
+            const status  = document.getElementById('claim-status');
+
+            const remaining     = getCooldownRemaining();
+            const sessionClaims = getSessionClaims();
+            const leftInSession = MAX_PER_SESSION - sessionClaims;
+
+            if (remaining > 0) {
+                // Cooldown active — show timer
+                btn.disabled = true;
+                btn.style.opacity  = '0.55';
+                btn.style.cursor   = 'not-allowed';
+                btnText.textContent = formatCountdown(remaining);
+                status.textContent  = 'Agle session mein 10 aur coins claim kar sako ge';
+            } else if (leftInSession <= 0) {
+                // Should not happen (session resets with cooldown) — safety net
+                btn.disabled = true;
+                btn.style.opacity = '0.55';
+                status.textContent = 'Session complete!';
+            } else {
+                // Ready to claim
+                btn.disabled       = false;
+                btn.style.opacity  = '1';
+                btn.style.cursor   = 'pointer';
+                btnText.innerHTML  = `<i class="fas fa-coins"></i>&nbsp; CLAIM COIN`;
+                status.textContent = `${leftInSession} claim${leftInSession !== 1 ? 's' : ''} baqi hain — phir 5 ghante wait`;
+            }
+        }
+
+        function startCooldownTimer() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                updateClaimUI();
+                if (getCooldownRemaining() <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+            }, 1000);
+        }
+
+        function claimCoin() {
+            if (isClaiming) return;
+            if (getCooldownRemaining() > 0) return;
+            if (getSessionClaims() >= MAX_PER_SESSION) return;
+            isClaiming = true;
+
+            const btn     = document.getElementById('claim-btn');
+            const bar     = document.getElementById('claim-bar');
+            const progress = document.getElementById('claim-progress');
+            const status  = document.getElementById('claim-status');
+            const btnText = document.getElementById('claim-btn-text');
+
+            btn.disabled       = true;
+            btnText.textContent = 'CLAIMING...';
+            status.textContent  = 'Processing...';
+            progress.style.display = 'block';
+
+            bar.style.width = '0%';
+            setTimeout(() => { bar.style.width = '100%'; }, 50);
+
+            setTimeout(() => {
+                // Add coin + update session count
+                const newTotal    = getCoins() + 1;
+                setCoins(newTotal);
+                const sessionDone = addSessionClaim();
+
+                spawnCoinPopup();
+
+                progress.style.display = 'none';
+                bar.style.width = '0%';
+                isClaiming = false;
+
+                // Flash coin icon
+                const icon = document.querySelector('.coin-icon-big');
+                icon.style.transform  = 'scale(1.3)';
+                icon.style.boxShadow  = '0 0 40px rgba(255,180,0,1)';
+                setTimeout(() => { icon.style.transform = ''; icon.style.boxShadow = ''; }, 400);
+
+                if (sessionDone >= MAX_PER_SESSION) {
+                    // Session limit reached — start 5-hour cooldown
+                    localStorage.setItem(getCooldownKey(), Date.now().toString());
+                    status.textContent = `10/10 coins claim ho gayi! 5 ghante baad wapis aao 🎉`;
+                    startCooldownTimer();
+                } else {
+                    const left = MAX_PER_SESSION - sessionDone;
+                    status.textContent = `+1 Coin! Total: ${newTotal} | ${left} baqi`;
+                    updateClaimUI();
+                }
+            }, 2000);
+        }
+
+        function spawnCoinPopup() {
+            const popup = document.createElement('div');
+            popup.className = 'coin-earn-popup';
+            popup.textContent = '+1 🪙';
+            const btn = document.getElementById('claim-btn');
+            const rect = btn.getBoundingClientRect();
+            popup.style.left = (rect.left + rect.width / 2 - 30) + 'px';
+            popup.style.top = (rect.top - 20) + 'px';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1500);
+        }
+
+        // ==================== OFFER SELECTION ====================
+        function selectOffer(amount, isPaid = false) {
+            if (isPaid) {
+                // Paid offers don't need coins
+                selectedAmount = amount;
+                document.getElementById('modal-coin-cost').textContent = 'PAID PACKAGE';
+                document.getElementById('link-modal').style.display = 'flex';
+                return;
+            }
+
+            const balance = getCoins();
+            if (balance >= amount) {
+                selectedAmount = amount;
+                document.getElementById('modal-coin-cost').textContent = `🪙 -${amount} COINS`;
+                document.getElementById('link-modal').style.display = 'flex';
+            } else {
+                showNoCoinModal(amount, balance);
+            }
+        }
+
+        function showNoCoinModal(required, balance) {
+            const stillNeed = required - balance;
+            document.getElementById('coins-needed-msg').innerHTML =
+                `You need <strong style="color:#ffd700;">${required} coins</strong> for this offer.<br>You have <strong style="color:#ff6b6b;">${balance} coins</strong> — still need <strong style="color:#ffd700;">${stillNeed} more</strong>.`;
+            document.getElementById('nc-balance').textContent = balance;
+            document.getElementById('nc-required').textContent = required;
+            document.getElementById('nc-still-need').textContent = `Claim ${stillNeed} more coin${stillNeed !== 1 ? 's' : ''} to unlock this offer`;
+
+            const pct = Math.min((balance / required) * 100, 100);
+            const fill = document.getElementById('coins-needed-fill');
+            fill.style.width = '0%';
+            setTimeout(() => { fill.style.width = pct + '%'; }, 100);
+
+            document.getElementById('no-coins-overlay').style.display = 'flex';
+        }
+
+        function closeNoCoinModal() {
+            document.getElementById('no-coins-overlay').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('link-modal').style.display = 'none';
+            // Clear preview on close
+            document.getElementById('post-link').value = '';
+            document.getElementById('account-preview').className = 'account-preview';
+        }
+
+        // ==================== PROFILE LINK PARSER ====================
+        let extractedAccount = null;
+
+        function parseProfileLink() {
+            const raw    = document.getElementById('post-link').value.trim();
+            const input  = document.getElementById('post-link');
+            const preview = document.getElementById('account-preview');
+            const submitBtn = document.querySelector('#link-modal .btn-primary');
+
+            if (!raw) {
+                preview.className = 'account-preview';
+                input.className = '';
+                submitBtn.disabled = false; // allow manual submit if empty (though submitRequest checks it)
+                return;
+            }
+
+            const result = rdxExtractUsername(raw);
+
+            if (result && !result.error) {
+                extractedAccount = result;
+                showValidPreview(input, preview, result);
+            } else {
+                showInvalidPreview(input, preview, result ? result.error : 'Invalid link');
+            }
+        }
+
+        function showValidPreview(input, preview, account) {
+            input.classList.remove('invalid-link');
+            input.classList.add('valid-link');
+
+            document.getElementById('preview-icon').style.background = account.bg;
+            document.getElementById('preview-icon').textContent       = account.icon;
+            document.getElementById('preview-platform').textContent   = account.platform;
+            document.getElementById('preview-username').textContent   = '@' + account.username;
+            document.getElementById('preview-realname').innerHTML     = '<span class="scanning-text"><i class="fas fa-circle-notch fa-spin" style="margin-right:0.4rem;"></i>Fetching name...</span>';
+
+            const badge = document.getElementById('preview-badge');
+            badge.textContent = '⟳ SCAN';
+            badge.style.cssText = 'background:rgba(255,180,0,0.15); border:1px solid rgba(255,180,0,0.3); color:#ffd700;';
+
+            preview.className = 'account-preview show';
+            preview.classList.remove('error');
+
+            const linkVal = document.getElementById('post-link').value.trim();
+            fetch('/api/profile-name?url=' + encodeURIComponent(linkVal))
+                .then(r => r.json())
+                .then(data => {
+                    const realNameEl = document.getElementById('preview-realname');
+                    const usernameEl = document.getElementById('preview-username');
+                    
+                    if (data.success && data.name) {
+                        usernameEl.textContent = data.name;
+                        realNameEl.textContent = (account.username.match(/^\d+$/)) ? 'UID: ' + account.username : '@' + account.username;
+                        extractedAccount.realName = data.name;
+                    } else {
+                        usernameEl.textContent = (account.username.match(/^\d+$/)) ? 'UID: ' + account.username : '@' + account.username;
+                        realNameEl.textContent = 'Name not available';
+                        extractedAccount.realName = '';
+                    }
+                    badge.textContent = '✓ OK';
+                    badge.style.cssText = 'background:rgba(0,255,136,0.15); border:1px solid rgba(0,255,136,0.3); color:var(--neon-green);';
+                })
+                .catch(() => {
+                    document.getElementById('preview-username').textContent = '@' + account.username;
+                    document.getElementById('preview-realname').textContent = '';
+                    badge.textContent = '✓ OK';
+                });
+        }
+
+        function showInvalidPreview(input, preview, msg) {
+            input.classList.remove('valid-link');
+            input.classList.add('invalid-link');
+            document.getElementById('preview-icon').style.background = 'rgba(239,68,68,0.1)';
+            document.getElementById('preview-icon').textContent = '❌';
+            document.getElementById('preview-platform').textContent = 'Error';
+            document.getElementById('preview-username').textContent = msg;
+            document.getElementById('preview-username').style.fontSize = '0.75rem';
+            document.getElementById('preview-realname').textContent = '';
+            
+            const badge = document.getElementById('preview-badge');
+            badge.textContent = '✗';
+            badge.style.cssText = 'background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#ef4444;';
+            
+            preview.className = 'account-preview show error';
+        }
+
+        function submitRequest() {
+            const link = document.getElementById('post-link').value.trim();
+            if (!link) { alert('Please enter a valid link!'); return; }
+
+            // Deduct coins for free offers
+            if (selectedAmount <= 50) {
+                const newBal = getCoins() - selectedAmount;
+                setCoins(newBal >= 0 ? newBal : 0);
+            }
+
+            const requests = JSON.parse(localStorage.getItem('rdx_requests') || '[]');
+            requests.push({
+                user: sessionStorage.getItem('currentUser'),
+                platform: sessionStorage.getItem('selectedPlatform'),
+                amount: selectedAmount,
+                link: link,
+                accountName: extractedAccount ? extractedAccount.username : '',
+                accountRealName: extractedAccount ? extractedAccount.realName : '',
+                time: new Date().toLocaleString()
+            });
+            localStorage.setItem('rdx_requests', JSON.stringify(requests));
+
+            const refId = '#RDX-' + Math.floor(Math.random() * 9000 + 1000) + '772';
+            document.getElementById('ref-id').innerText = 'Ref ID: ' + refId;
+
+            document.getElementById('link-modal').style.display = 'none';
+            document.getElementById('waiting-screen').style.display = 'flex';
+        }
+
+        // ==================== ACCESS CHECK ====================
+        function checkAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refPlatform = urlParams.get('ref');
+            if (refPlatform) sessionStorage.setItem('selectedPlatform', refPlatform);
+
+            const platformKey = (refPlatform || '').toLowerCase();
+            const isLoggedIn = platformKey ? sessionStorage.getItem('userLoggedIn_' + platformKey) : null;
+            if (!isLoggedIn) {
+                const dest = refPlatform ? 'login.html?ref=' + refPlatform : 'login.html';
+                window.location.href = dest;
+                return;
+            }
+
+            const user = sessionStorage.getItem('currentUser_' + platformKey) || sessionStorage.getItem('currentUser');
+            const platform = sessionStorage.getItem('selectedPlatform') || 'Social';
+            document.getElementById('user-info').innerHTML = '<i class="fas fa-user" style="margin-right:0.5rem;"></i>' + user;
+            document.getElementById('platform-heading').innerText = platform.toUpperCase() + ' SERVICES';
+            document.getElementById('platform-badge').innerText = platform.toUpperCase();
+
+            // Load coins balance
+            animateCoinDisplay(getCoins());
+
+            // Restore correct UI state on page load
+            updateClaimUI();
+            if (getCooldownRemaining() > 0) {
+                startCooldownTimer();
+            }
+        }
+    </script>
+</body>
+</html>

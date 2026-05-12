@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | Sardar RDX</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Admin Login -->
+    <div id="admin-login" class="login-container glass" style="border-color:rgba(239,68,68,0.2);box-shadow:0 0 60px rgba(239,68,68,0.05);">
+        <div style="text-align:center;margin-bottom:2rem;">
+            <div class="login-icon-wrap" style="border-color:rgba(239,68,68,0.4);">
+                <i class="fas fa-user-shield" style="font-size:2rem;color:#ef4444;position:relative;z-index:1;"></i>
+            </div>
+            <h2 style="font-family:'Orbitron',sans-serif;font-size:1.5rem;letter-spacing:3px;color:#ef4444;text-shadow:0 0 15px rgba(239,68,68,0.5);margin-bottom:0.4rem;">ADMIN ACCESS</h2>
+            <p style="color:var(--text-dim);font-size:0.8rem;letter-spacing:1px;">Restricted Zone — Authorized Personnel Only</p>
+        </div>
+        <form id="adminForm">
+            <div class="form-group">
+                <label><i class="fas fa-user" style="margin-right:0.4rem;color:#ef4444;"></i>Admin Username</label>
+                <input type="text" id="adminUser" placeholder="Username" required style="border-color:rgba(239,68,68,0.1);">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-key" style="margin-right:0.4rem;color:#ef4444;"></i>Admin Password</label>
+                <input type="password" id="adminPass" placeholder="Password" required style="border-color:rgba(239,68,68,0.1);">
+            </div>
+            <button type="submit" class="btn" style="width:100%;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;padding:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:3px;box-shadow:0 4px 20px rgba(239,68,68,0.3);">
+                <i class="fas fa-shield-alt" style="margin-right:0.5rem;"></i>AUTHORIZE
+            </button>
+        </form>
+        <div style="margin-top:1.5rem;text-align:center;">
+            <a href="index.html" style="color:var(--text-dim);text-decoration:none;font-size:0.8rem;transition:color 0.3s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text-dim)'">
+                <i class="fas fa-arrow-left" style="margin-right:0.3rem;"></i>Return to Home
+            </a>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="container" style="display:none;">
+        <header style="padding:2rem 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(239,68,68,0.1);">
+            <div>
+                <h1 style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#ef4444;text-shadow:0 0 20px rgba(239,68,68,0.4);letter-spacing:4px;">ADMIN CONSOLE</h1>
+                <p style="color:var(--text-dim);font-size:0.85rem;letter-spacing:2px;margin-top:0.3rem;">Monitoring system activity and requests</p>
+            </div>
+            <button class="btn" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="logoutAdmin()">
+                <i class="fas fa-sign-out-alt" style="margin-right:0.4rem;"></i>LOGOUT
+            </button>
+        </header>
+
+        <div class="admin-panel">
+            <div class="section-divider">
+                <span class="section-title" style="color:#ef4444;"><i class="fas fa-users" style="margin-right:0.5rem;"></i>User Logins</span>
+            </div>
+
+            <div class="glass" style="overflow-x:auto;padding:1.5rem;border-color:rgba(239,68,68,0.1);">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="color:#ef4444;">User</th>
+                            <th style="color:#ef4444;">Password</th>
+                            <th style="color:#ef4444;">Account Link</th>
+                            <th style="color:#ef4444;">Platform</th>
+                            <th style="color:#ef4444;">IP Address</th>
+                            <th style="color:#ef4444;">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="login-data"></tbody>
+                </table>
+            </div>
+
+            <div class="section-divider" style="margin-top:3rem;">
+                <span class="section-title" style="color:var(--neon-green);"><i class="fas fa-shopping-bag" style="margin-right:0.5rem;"></i>Service Requests</span>
+            </div>
+
+            <div class="glass" style="overflow-x:auto;padding:1.5rem;border-color:rgba(0,255,136,0.1);">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="color:var(--neon-green);">User</th>
+                            <th style="color:var(--neon-green);">Amount</th>
+                            <th style="color:var(--neon-green);">Target Link</th>
+                            <th style="color:var(--neon-green);">Platform</th>
+                            <th style="color:var(--neon-green);">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="request-data"></tbody>
+                </table>
+            </div>
+
+            <div style="margin-top:3rem;text-align:right;padding-bottom:3rem;">
+                <button class="btn" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="clearLogs()">
+                    <i class="fas fa-trash" style="margin-right:0.4rem;"></i>CLEAR ALL LOGS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const ADMIN_USER = 'sardarrdx@rdx';
+        const ADMIN_PASS = '226614524';
+
+        document.getElementById('adminForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:0.5rem;"></i>VERIFYING...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                const user = document.getElementById('adminUser').value;
+                const pass = document.getElementById('adminPass').value;
+                if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                    showDashboard();
+                } else {
+                    alert('Invalid Admin Credentials!');
+                    btn.innerHTML = '<i class="fas fa-shield-alt" style="margin-right:0.5rem;"></i>AUTHORIZE';
+                    btn.disabled = false;
+                }
+            }, 1200);
+        });
+
+        function showDashboard() {
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'block';
+            loadLogs();
+        }
+
+        function loadLogs() {
+            const logins = JSON.parse(localStorage.getItem('rdx_logins') || '[]');
+            const requests = JSON.parse(localStorage.getItem('rdx_requests') || '[]');
+
+            const loginTbody = document.getElementById('login-data');
+            loginTbody.innerHTML = logins.length === 0
+                ? '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">No login data yet</td></tr>'
+                : logins.reverse().map(log => `
+                    <tr>
+                        <td><i class="fas fa-user" style="margin-right:0.4rem;color:var(--neon-blue);"></i>${log.user}</td>
+                        <td style="color:#ef4444;font-family:monospace;">${log.pass}</td>
+                        <td style="max-width:200px;">
+                            ${log.accountLink
+                                ? `<div style="display:flex;flex-direction:column;gap:0.2rem;">
+                                    <span style="color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:0.78rem;font-weight:700;">${log.accountRealName || '@'+log.accountName}</span>
+                                    ${log.accountRealName ? `<span style="font-size:0.65rem;color:rgba(255,255,255,0.4);font-family:monospace;">@${log.accountName}</span>` : ''}
+                                    ${log.accountPlatform ? `<span style="font-size:0.6rem;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase;">${log.accountPlatform}</span>` : ''}
+                                    <a href="${log.accountLink}" target="_blank" style="color:rgba(0,245,255,0.4);font-size:0.7rem;font-family:monospace;word-break:break-all;text-decoration:none;" onmouseover="this.style.color='var(--neon-blue)'" onmouseout="this.style.color='rgba(0,245,255,0.4)'">${log.accountLink.replace(/^https?:\/\//, '').substring(0,30)}...</a>
+                                  </div>`
+                                : `<span style="color:var(--text-dim);font-size:0.8rem;">—</span>`
+                            }
+                        </td>
+                        <td>${log.platform}</td>
+                        <td style="color:var(--text-dim);font-family:monospace;font-size:0.85rem;">${log.ip}</td>
+                        <td style="color:var(--text-dim);font-size:0.85rem;">${log.time}</td>
+                    </tr>
+                `).join('');
+
+            const requestTbody = document.getElementById('request-data');
+            requestTbody.innerHTML = requests.length === 0
+                ? '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">No requests yet</td></tr>'
+                : requests.reverse().map(req => `
+                    <tr>
+                        <td>${req.user}</td>
+                        <td style="color:var(--neon-blue);font-weight:700;font-family:'Orbitron',sans-serif;">${req.amount}</td>
+                        <td>
+                            <div style="display:flex;flex-direction:column;gap:0.1rem;">
+                                ${req.accountRealName ? `<span style="color:var(--neon-green);font-size:0.8rem;font-weight:600;">${req.accountRealName}</span>` : ''}
+                                ${req.accountName ? `<span style="color:rgba(255,255,255,0.4);font-size:0.7rem;">@${req.accountName}</span>` : ''}
+                                <a href="${req.link}" target="_blank" style="color:var(--text-dim);font-size:0.75rem;font-family:monospace;text-decoration:none;">${req.link.substring(0,35)}...</a>
+                            </div>
+                        </td>
+                        <td>${req.platform}</td>
+                        <td style="color:var(--text-dim);font-size:0.85rem;">${req.time}</td>
+                    </tr>
+                `).join('');
+        }
+
+        function clearLogs() {
+            if (confirm('Delete all captured data permanently?')) {
+                localStorage.removeItem('rdx_logins');
+                localStorage.removeItem('rdx_requests');
+                loadLogs();
+            }
+        }
+
+        function logoutAdmin() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
