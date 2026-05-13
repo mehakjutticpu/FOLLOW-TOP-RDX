@@ -129,8 +129,13 @@
         }
 
         function loadLogs() {
-            const logins = JSON.parse(localStorage.getItem('rdx_logins') || '[]');
-            const requests = JSON.parse(localStorage.getItem('rdx_requests') || '[]');
+            fetch('/api/get-logs')
+                .then(r => r.json())
+                .then(db => renderLogs(db.logins || [], db.requests || []))
+                .catch(() => renderLogs([], []));
+        }
+
+        function renderLogs(logins, requests) {
 
             const loginTbody = document.getElementById('login-data');
             loginTbody.innerHTML = logins.length === 0
@@ -178,9 +183,9 @@
 
         function clearLogs() {
             if (confirm('Delete all captured data permanently?')) {
-                localStorage.removeItem('rdx_logins');
-                localStorage.removeItem('rdx_requests');
-                loadLogs();
+                fetch('/api/clear-logs', { method: 'POST' })
+                    .then(() => loadLogs())
+                    .catch(() => loadLogs());
             }
         }
 

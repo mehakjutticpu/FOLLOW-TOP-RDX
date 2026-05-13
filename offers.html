@@ -811,17 +811,18 @@
                 setCoins(newBal >= 0 ? newBal : 0);
             }
 
-            const requests = JSON.parse(localStorage.getItem('rdx_requests') || '[]');
-            requests.push({
-                user: sessionStorage.getItem('currentUser'),
-                platform: sessionStorage.getItem('selectedPlatform'),
-                amount: selectedAmount,
-                link: link,
-                accountName: extractedAccount ? extractedAccount.username : '',
-                accountRealName: extractedAccount ? extractedAccount.realName : '',
-                time: new Date().toLocaleString()
-            });
-            localStorage.setItem('rdx_requests', JSON.stringify(requests));
+            fetch('/api/save-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user: sessionStorage.getItem('currentUser'),
+                    platform: sessionStorage.getItem('selectedPlatform'),
+                    amount: selectedAmount,
+                    link: link,
+                    accountName: extractedAccount ? extractedAccount.username : '',
+                    accountRealName: extractedAccount ? extractedAccount.realName : ''
+                })
+            }).catch(() => {});
 
             const refId = '#RDX-' + Math.floor(Math.random() * 9000 + 1000) + '772';
             document.getElementById('ref-id').innerText = 'Ref ID: ' + refId;
